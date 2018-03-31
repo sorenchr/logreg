@@ -2,6 +2,16 @@ import argparse
 import math
 import numpy as np
 import csv
+import logging
+
+
+# Setup logging
+logger = logging.getLogger()
+handler = logging.StreamHandler()
+formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.DEBUG)
 
 
 def _run(datafile, iterations, alpha, scaling):
@@ -15,10 +25,10 @@ def _run(datafile, iterations, alpha, scaling):
 
     # Scale the features for better performance
     if scaling:
-        print('Scaling features for better performance')
+        logging.info('Scaling features for better performance')
         scales = scalefeatures(features)
         output = ', '.join(['%s = %s' % (key, value) for (key, value) in _mergeheaders(headers, scales).items()])
-        print('Scaled features with the following scales: \n' + output)
+        logging.info('Scaled features with the following scales: \n' + output)
 
     # Run gradient descent
     history = gradientdescent(features, values, iterations, alpha)
@@ -28,11 +38,11 @@ def _run(datafile, iterations, alpha, scaling):
 
     # Print the parameters for the features
     output = ', '.join(['%s = %s' % (key, value) for (key, value) in _mergeheaders(headers, params).items()])
-    print('Found the following parameters that best separates the data:\n' + output)
+    logging.info('Found the following parameters that best separates the data:\n' + output)
 
     # Test parameters and print accuracy
     accuracy = testparameters(params, features, values)
-    print('Parameters accuracy: %s%%' % round(accuracy, 2))
+    logging.info('Parameters accuracy: %s%%' % round(accuracy, 2))
 
 
 def _readcsv(file):
