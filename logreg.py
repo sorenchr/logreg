@@ -4,7 +4,7 @@ import numpy as np
 import csv
 
 
-def _run(datafile, iterations, alpha):
+def _run(datafile, iterations, alpha, scaling):
     # Read CSV file into matrix and split into features and values
     headers, rows = _readcsv(datafile)
     headers.insert(0, 'intercept')  # add the y-intercept as a feature header itself
@@ -12,6 +12,13 @@ def _run(datafile, iterations, alpha):
     features = matrix[:, :-1]
     values = matrix[:, -1]
     features = np.insert(features, 0, 1, axis=1)  # left-pad the features with 1's
+
+    # Scale the features for better performance
+    if scaling:
+        print('Scaling features for better performance')
+        scales = scalefeatures(features)
+        output = ', '.join(['%s = %s' % (key, value) for (key, value) in _mergeheaders(headers, scales).items()])
+        print('Scaled features with the following scales: \n' + output)
 
     # Run gradient descent
     history = gradientdescent(features, values, iterations, alpha)
@@ -90,11 +97,33 @@ def testparameters(parameters, features, values):
     return (hits / m) * 100
 
 
+def scalefeatures(features):
+    """Scales the features of the matrix such that they are in the range [-1;1]."""
+    colindex = -1
+    n = features.shape[1]  # number of features
+    scales = np.ones((n, 1))
+    for column in features.T:
+        colindex += 1
+        stddev = np.max(column) - np.min(column)
+
+        if stddev == 0:  # ignore features that don't change in value
+            continue
+
+        avg = np.full((features.shape[0], 1), np.average(column))
+        stddev = np.full((features.shape[0], 1), stddev)
+
+        features[:, colindex] = (column.T - avg) / stddev
+        scales[colindex] = 1 / stddev.item(colindex)
+
+    return scales
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('data', type=str, help='the CSV file containing the data')
     parser.add_argument('-a', '--alpha', type=float, default=0.01, help='the learning rate for gradient descent')
     parser.add_argument('-i', '--iterations', type=int, default=1500,
                         help='the number of iterations for gradient descent')
+    parser.add_argument('-ns', '--noscaling', action='store_true', default=False, help='turn off feature scaling')
     args = parser.parse_args()
-    _run(args.data, args.iterations, args.alpha)
+    _run(args.data, args.iterations, args.alpha, not args.noscaling)

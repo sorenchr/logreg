@@ -10,6 +10,11 @@ This is a simple implementation of logistic regression using a gradient descent 
     />
 </p>
 
+## Features
+
+* Automatic feature scaling
+* Customizable parameters (learning rate, iterations)
+
 ## Data files
 
 Data files must be in CSV format, with the following structure:
@@ -51,6 +56,7 @@ The following arguments are available:
 - ``-h``,``--help``: Display help on usage
 - ``-a``,``--alpha``: Set the learning rate manually (default is 0.01)
 - ``-i``,``--iterations``: Set the number of iterations manually (default is 1500)
+- ``-ns``,``--noscaling``: Turn off feature scaling (there is no feature scaling when using the normal equation method)
 
 ### Imported module
 
