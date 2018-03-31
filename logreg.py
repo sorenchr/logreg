@@ -3,7 +3,6 @@ import math
 import numpy as np
 import csv
 
-np.seterr(all='raise')
 
 def _run(datafile, iterations, alpha):
     # Read CSV file into matrix and split into features and values
