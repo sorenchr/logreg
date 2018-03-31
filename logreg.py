@@ -21,7 +21,7 @@ def _run(datafile, iterations, alpha):
 
     # Print the parameters for the features
     output = ', '.join(['%s = %s' % (key, value) for (key, value) in _mergeheaders(headers, params).items()])
-    print(output)
+    print('Found the following parameters that best separates the data:\n' + output)
 
     # Test parameters and print accuracy
     accuracy = testparameters(params, features, values)
